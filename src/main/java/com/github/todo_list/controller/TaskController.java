@@ -3,6 +3,7 @@ package com.github.todo_list.controller;
 import com.github.todo_list.model.entity.Task;
 import com.github.todo_list.service.TaskService;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
@@ -27,7 +28,10 @@ public class TaskController {
 
     @PostMapping
     public ResponseEntity<Task> createTask(@RequestBody Task task) {
-        return ResponseEntity.ok(taskService.create(task));
+        Task createdTask = taskService.create(task);
+        return ResponseEntity
+                .status(HttpStatus.CREATED)
+                .body(createdTask);
     }
 
     @PutMapping("/{taskId}")

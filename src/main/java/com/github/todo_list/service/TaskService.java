@@ -1,15 +1,15 @@
 package com.github.todo_list.service;
 
+import com.github.todo_list.exception.ResourceNotFoundException;
 import com.github.todo_list.model.entity.Task;
 import com.github.todo_list.model.enums.TaskStatusEnum;
 import com.github.todo_list.repository.TaskRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.time.LocalDateTime;
 import java.util.List;
-import java.util.NoSuchElementException;
-import java.util.Optional;
 
 @Service
 public class TaskService {
@@ -21,15 +21,12 @@ public class TaskService {
         return taskRepository.findAll();
     }
 
-    public Task getById(Long id) {
-        Optional<Task> optionalTask = taskRepository.findById(id);
-        if (optionalTask.isPresent()) {
-            return optionalTask.get();
-        } else {
-            throw new RuntimeException("Task not found with id " + id);
-        }
+    public Task getById(Long taskId) {
+        return taskRepository.findById(taskId)
+                .orElseThrow(() -> new ResourceNotFoundException("Task not found with id: " + taskId));
     }
 
+    @Transactional
     public Task create(Task task) {
         task.setCreatedAt(LocalDateTime.now());
         task.setUpdatedAt(LocalDateTime.now());
@@ -37,9 +34,10 @@ public class TaskService {
         return taskRepository.save(task);
     }
 
-    public Task update(Long id, Task task) {
-        Task existingTask = taskRepository.findById(id)
-                        .orElseThrow(() -> new NoSuchElementException("Task not found"));
+    @Transactional
+    public Task update(Long taskId, Task task) {
+        Task existingTask = taskRepository.findById(taskId)
+                        .orElseThrow(() -> new ResourceNotFoundException("Task not found with id: " + taskId));
         existingTask.setUpdatedAt(LocalDateTime.now());
         existingTask.setTitle(task.getTitle());
         existingTask.setDescription(task.getDescription());
@@ -47,9 +45,10 @@ public class TaskService {
         return taskRepository.save(existingTask);
     }
 
-    public void delete(Long id) {
-        Task existingTask = taskRepository.findById(id)
-                .orElseThrow(() -> new NoSuchElementException("Task not found"));
+    @Transactional
+    public void delete(Long taskId) {
+        Task existingTask = taskRepository.findById(taskId)
+                .orElseThrow(() -> new ResourceNotFoundException("Task not found with id: " + taskId));
         taskRepository.delete(existingTask);
     }
 }

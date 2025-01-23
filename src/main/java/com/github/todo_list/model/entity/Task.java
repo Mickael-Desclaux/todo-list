@@ -2,6 +2,8 @@ package com.github.todo_list.model.entity;
 
 import com.github.todo_list.model.enums.TaskStatusEnum;
 import jakarta.persistence.*;
+import jakarta.validation.constraints.NotNull;
+import jakarta.validation.constraints.Size;
 
 import java.time.LocalDateTime;
 
@@ -12,10 +14,15 @@ public class Task {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
+    @NotNull
+    @Size(min = 1, max = 100)
     private String title;
 
+    @Size(max = 500)
     private String description;
 
+    @NotNull()
+    @Enumerated(EnumType.STRING)
     private TaskStatusEnum taskStatus;
 
     private LocalDateTime createdAt;
